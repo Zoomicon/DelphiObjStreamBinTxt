@@ -217,6 +217,8 @@
                 <Source>
                     <Source Name="MainSource">DelphiObjStreamBinTxt.dpr</Source>
                 </Source>
+                <WelcomePageFile Path="README.md"/>
+                <WelcomePageFolder/>
             </Delphi.Personality>
             <Deployment Version="5">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">

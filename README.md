@@ -4,7 +4,7 @@ Toggle Delphi Object Stream file between Binary and Text formats
 
 ## Usage
 
-> DelphiObjStreamBinTxt.exe inputfile outputfile
+`DelphiObjStreamBinTxt.exe inputfile [outputfile]`
 
 ## Function
 

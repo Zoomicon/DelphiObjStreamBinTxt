@@ -1,6 +1,6 @@
 //Title: DelphiObjStreamBinTxt
 //Description: Toggle Delphi Object Stream file between Binary and Text formats
-//Usage: DelphiObjStreamBinTxt inputfile outputfile
+//Usage: DelphiObjStreamBinTxt inputfile [outputfile]
 //Author: George Birbilis / Zoomicon.com
 
 program DelphiObjStreamBinTxt;
@@ -8,8 +8,11 @@ program DelphiObjStreamBinTxt;
 {$APPTYPE CONSOLE}
 
 uses
+  {$IF DEFINED(MSWINDOWS)}
+  Winapi.Windows, //to avoid [dcc32 Hint] H2443 Inline function 'RenameFile' has not been expanded because unit 'Winapi.Windows' is not specified in USES list
+  {$ENDIF}
   System.Classes,
-  System.SysUtils;
+  System.SysUtils; //for TBytes, SameText, FileExists, fmOpenRead, fmShareDenyWrite, DeleteFile, RenameFile //MUST DEFINE AFTER Winapi.Windows
 
 const
   ERR_USAGE = 1;
@@ -47,7 +50,7 @@ end;
 
 procedure ShowUsage;
 begin
-  Writeln('Usage: DelphiObjStreamBinTxt inputfile outputfile');
+  Writeln('Usage: DelphiObjStreamBinTxt inputfile [outputfile]');
   Writeln('Toggle Delphi Object Stream file between Binary and Text formats');
 end;
 
@@ -56,15 +59,20 @@ var
   InputStream, OutputStream: TFileStream;
 
 begin
-  if ParamCount <> 2 then
+  if (ParamCount >= 1) then
+    InputFile := ParamStr(1);
+
+  if (ParamCount >= 2) then
+    OutputFile := ParamStr(2)
+  else
+    OutputFile := InputFile + '.tmp';
+
+  if ParamCount not in [1,2] then
   begin
     ShowUsage;
     ExitCode := ERR_USAGE;
     Exit;
   end;
-
-  InputFile := ParamStr(1);
-  OutputFile := ParamStr(2);
 
   if not FileExists(InputFile) then
   begin
@@ -84,6 +92,12 @@ begin
     begin
       Writeln('Error: Unknown format — expected Delphi binary or text object stream');
       ExitCode := ERR_UNKNOWN_FORMAT;
+    end;
+
+    if (ParamCount = 1) then //no outputfile given, replace inputfile
+    begin
+      DeleteFile(InputFile);
+      RenameFile(OutputFile, InputFile);
     end;
   finally
     InputStream.Free;
